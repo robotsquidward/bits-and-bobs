@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bits and Bobs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;600&display=swap">
+  <style>
+    :root {
+      --bg: #efe6d4;
+      --card: #fbf6ea;
+      --ink: #2b2118;
+      --muted: #7a6a58;
+      --accent: #8c2f1b;
+      --accent-ink: #fff8ee;
+      --border: #d8c8aa;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #17130f;
+        --card: #231d17;
+        --ink: #eee3cf;
+        --muted: #a8977f;
+        --accent: #d0664a;
+        --accent-ink: #1a120c;
+        --border: #3b3127;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Inter, system-ui, sans-serif;
+    }
+    main { width: 100%; max-width: 640px; text-align: center; }
+    h1 {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 2.4rem;
+      margin: 0 0 4px;
+    }
+    .sub { color: var(--muted); margin: 0 0 24px; font-size: 0.95rem; }
+    .controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    select, button {
+      font: inherit;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--ink);
+    }
+    button {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:active { transform: translateY(1px); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 28px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 6px 24px rgb(0 0 0 / 0.08);
+    }
+    .roll { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+    .text {
+      font-family: "Cormorant Garamond", Georgia, serif;
+      font-size: 1.6rem;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .card.fresh { animation: pop 0.35s ease-out; }
+    @keyframes pop { from { opacity: 0; transform: translateY(6px); } }
+    .hint { color: var(--muted); font-size: 0.8rem; margin-top: 16px; }
+    kbd { font-family: inherit; border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Bits and Bobs</h1>
+    <p class="sub">A random trinket for your pocket.</p>
+
+    <div class="controls">
+      <select id="table" aria-label="Table to roll on"></select>
+      <button id="roll">Roll a trinket</button>
+    </div>
+
+    <div class="card" id="card" aria-live="polite">
+      <div class="roll" id="rollLabel"></div>
+      <p class="text" id="text"></p>
+    </div>
+
+    <p class="hint">Press <kbd>Space</kbd> to roll again</p>
+  </main>
+
+  <script src="trinkets.js"></script>
+  <script>
+    const { trinkets, locations } = window.TRINKET_DATA;
+    const tables = { "All trinkets": trinkets, ...locations };
+
+    const select = document.getElementById("table");
+    const card = document.getElementById("card");
+    const text = document.getElementById("text");
+    const rollLabel = document.getElementById("rollLabel");
+
+    for (const name of Object.keys(tables)) {
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = `${name} (d${tables[name].length})`;
+      select.append(opt);
+    }
+
+    let last = -1;
+    function roll() {
+      const list = tables[select.value];
+      let i;
+      do { i = Math.floor(Math.random() * list.length); } while (i === last && list.length > 1);
+      last = i;
+      rollLabel.textContent = `d${list.length} · rolled ${i + 1}`;
+      text.textContent = list[i];
+      card.classList.remove("fresh");
+      void card.offsetWidth; // restart the animation
+      card.classList.add("fresh");
+    }
+
+    document.getElementById("roll").addEventListener("click", roll);
+    select.addEventListener("change", () => { last = -1; roll(); });
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && e.target.tagName !== "SELECT" && e.target.tagName !== "BUTTON") {
+        e.preventDefault();
+        roll();
+      }
+    });
+
+    roll();
+  </script>
+</body>
+</html>
