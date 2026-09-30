@@ -1,0 +1,1 @@
+Roll on the [Trinkets table](https://docs.google.com/spreadsheets/d/1v5sVgsxUIwGcZ0czsmH2wHYxFlADv5SIzNjWAJsfNJ4/edit?gid=0#gid=0) originally posted on [r/DndBehindTheScreen](https://www.reddit.com/r/DnDBehindTheScreen/comments/4wk736/1000_trinkets/).
